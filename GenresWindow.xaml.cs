@@ -18,12 +18,8 @@ namespace LibraryManager
             LoadGenres();
         }
 
-        private void LoadGenres()
-        {
-            GenresDataGrid.ItemsSource = _context.Genres.ToList();
-        }
+        private void LoadGenres() => GenresDataGrid.ItemsSource = _context.Genres.ToList();
 
-        // При клике на жанр в таблице, заполняем поля для редактирования
         private void GenresDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (GenresDataGrid.SelectedItem is Genre genre)
@@ -36,54 +32,39 @@ namespace LibraryManager
 
         private void AddGenre_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(NameTextBox.Text))
+            var name = NameTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            // Строгая проверка на дубликат (Роман == роман)
+            bool exists = _context.Genres.ToList().Any(g => g.Name.ToLower() == name.ToLower());
+            if (exists)
             {
-                MessageBox.Show("Введите название жанра.");
+                MessageBox.Show("Такой жанр уже существует!");
                 return;
             }
 
-            var newGenre = new Genre
-            {
-                Name = NameTextBox.Text,
-                Description = DescriptionTextBox.Text
-            };
-
-            _context.Genres.Add(newGenre);
+            _context.Genres.Add(new Genre { Name = name, Description = DescriptionTextBox.Text });
             _context.SaveChanges();
-            
             ClearInputs();
             LoadGenres();
         }
 
         private void EditGenre_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedGenre == null)
-            {
-                MessageBox.Show("Выберите жанр для редактирования.");
-                return;
-            }
-
-            _selectedGenre.Name = NameTextBox.Text;
+            if (_selectedGenre == null) return;
+            _selectedGenre.Name = NameTextBox.Text.Trim();
             _selectedGenre.Description = DescriptionTextBox.Text;
-
             _context.SaveChanges();
-            
             ClearInputs();
             LoadGenres();
         }
 
         private void DeleteGenre_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedGenre == null) return;
-
-            var result = MessageBox.Show($"Удалить жанр '{_selectedGenre.Name}'? Это также удалит все книги этого жанра!", 
-                                         "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            
-            if (result == MessageBoxResult.Yes)
+            if (_selectedGenre != null && MessageBox.Show("Удалить жанр?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 _context.Genres.Remove(_selectedGenre);
                 _context.SaveChanges();
-                
                 ClearInputs();
                 LoadGenres();
             }

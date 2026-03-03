@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace LibraryManager.Models
 {
     public class Book
@@ -8,11 +11,12 @@ namespace LibraryManager.Models
         public string ISBN { get; set; }
         public int QuantityInStock { get; set; }
 
-        // Внешние ключи и навигационные свойства
-        public int AuthorId { get; set; }
-        public Author Author { get; set; } 
+        // Теперь тут списки (многие-ко-многим)
+        public List<Author> Authors { get; set; } = new List<Author>();
+        public List<Genre> Genres { get; set; } = new List<Genre>();
 
-        public int GenreId { get; set; }
-        public Genre Genre { get; set; } 
+        // Вспомогательные свойства для красивого вывода в таблицу
+        public string AuthorsString => string.Join(", ", Authors.Select(a => a.LastName));
+        public string GenresString => string.Join(", ", Genres.Select(g => g.Name));
     }
 }

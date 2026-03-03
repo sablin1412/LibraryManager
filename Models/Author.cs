@@ -11,7 +11,6 @@ namespace LibraryManager.Models
         public DateTime BirthDate { get; set; }
         public string Country { get; set; }
 
-        // Навигационное свойство для связи "один-ко-многим"
         public List<Book> Books { get; set; } = new List<Book>();
     }
 }

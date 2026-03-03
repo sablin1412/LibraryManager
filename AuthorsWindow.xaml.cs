@@ -19,13 +19,8 @@ namespace LibraryManager
             LoadAuthors();
         }
 
-        private void LoadAuthors()
-        {
-            // Выгружаем всех авторов из БД
-            AuthorsDataGrid.ItemsSource = _context.Authors.ToList();
-        }
+        private void LoadAuthors() => AuthorsDataGrid.ItemsSource = _context.Authors.ToList();
 
-        // Заполнение полей при клике на автора в таблице
         private void AuthorsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (AuthorsDataGrid.SelectedItem is Author author)
@@ -40,59 +35,50 @@ namespace LibraryManager
 
         private void AddAuthor_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(FirstNameTextBox.Text) || string.IsNullOrWhiteSpace(LastNameTextBox.Text))
+            var firstName = FirstNameTextBox.Text.Trim();
+            var lastName = LastNameTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName)) return;
+
+            // Строгая проверка на дубликат (Иван Иванов == иван иванов)
+            bool exists = _context.Authors.ToList().Any(a => 
+                a.FirstName.ToLower() == firstName.ToLower() && 
+                a.LastName.ToLower() == lastName.ToLower());
+            
+            if (exists)
             {
-                MessageBox.Show("Имя и фамилия обязательны для заполнения!");
+                MessageBox.Show("Такой автор уже добавлен!");
                 return;
             }
 
-            var newAuthor = new Author
-            {
-                FirstName = FirstNameTextBox.Text,
-                LastName = LastNameTextBox.Text,
-                Country = CountryTextBox.Text,
-                // Если дата не выбрана, ставим сегодняшнюю
+            _context.Authors.Add(new Author { 
+                FirstName = firstName, 
+                LastName = lastName, 
+                Country = CountryTextBox.Text, 
                 BirthDate = BirthDatePicker.SelectedDate ?? DateTime.Now 
-            };
-
-            _context.Authors.Add(newAuthor);
+            });
             _context.SaveChanges();
-            
             ClearInputs();
             LoadAuthors();
         }
 
         private void EditAuthor_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedAuthor == null)
-            {
-                MessageBox.Show("Сначала выберите автора в таблице.");
-                return;
-            }
-
-            _selectedAuthor.FirstName = FirstNameTextBox.Text;
-            _selectedAuthor.LastName = LastNameTextBox.Text;
+            if (_selectedAuthor == null) return;
+            _selectedAuthor.FirstName = FirstNameTextBox.Text.Trim();
+            _selectedAuthor.LastName = LastNameTextBox.Text.Trim();
             _selectedAuthor.Country = CountryTextBox.Text;
             _selectedAuthor.BirthDate = BirthDatePicker.SelectedDate ?? DateTime.Now;
-
             _context.SaveChanges();
-            
             ClearInputs();
             LoadAuthors();
         }
 
         private void DeleteAuthor_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedAuthor == null) return;
-
-            var result = MessageBox.Show($"Удалить автора '{_selectedAuthor.FirstName} {_selectedAuthor.LastName}'? Это также удалит все его книги!", 
-                                         "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            
-            if (result == MessageBoxResult.Yes)
+            if (_selectedAuthor != null && MessageBox.Show("Удалить автора?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 _context.Authors.Remove(_selectedAuthor);
                 _context.SaveChanges();
-                
                 ClearInputs();
                 LoadAuthors();
             }

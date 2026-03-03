@@ -1,7 +1,7 @@
 <Window x:Class="LibraryManager.BookWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Книга" Height="350" Width="400"
+        Title="Книга" Height="450" Width="450"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Grid Margin="15">
         <Grid.RowDefinitions>
@@ -22,20 +22,34 @@
         <TextBlock Text="Название:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontWeight="Bold" Margin="0,5"/>
         <TextBox x:Name="TitleTextBox" Grid.Row="0" Grid.Column="1" Margin="0,5" Padding="2"/>
 
-        <TextBlock Text="Автор:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" FontWeight="Bold" Margin="0,5"/>
-        <ComboBox x:Name="AuthorComboBox" Grid.Row="1" Grid.Column="1" Margin="0,5" DisplayMemberPath="LastName" SelectedValuePath="Id"/>
+        <TextBlock Text="Авторы:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" FontWeight="Bold" Margin="0,5"/>
+        <ListBox x:Name="AuthorsListBox" Grid.Row="1" Grid.Column="1" Margin="0,5" Height="80" SelectionMode="Multiple">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding LastName}" 
+                              IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
-        <TextBlock Text="Жанр:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" FontWeight="Bold" Margin="0,5"/>
-        <ComboBox x:Name="GenreComboBox" Grid.Row="2" Grid.Column="1" Margin="0,5" DisplayMemberPath="Name" SelectedValuePath="Id"/>
+        <TextBlock Text="Жанры:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Top" FontWeight="Bold" Margin="0,5"/>
+        <ListBox x:Name="GenresListBox" Grid.Row="2" Grid.Column="1" Margin="0,5" Height="80" SelectionMode="Multiple">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding Name}" 
+                              IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <TextBlock Text="Год издания:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
-        <TextBox x:Name="YearTextBox" Grid.Row="3" Grid.Column="1" Margin="0,5" Padding="2"/>
+        <TextBox x:Name="YearTextBox" Grid.Row="3" Grid.Column="1" Margin="0,5" Padding="2" PreviewTextInput="NumberValidationTextBox"/>
 
         <TextBlock Text="ISBN:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
-        <TextBox x:Name="IsbnTextBox" Grid.Row="4" Grid.Column="1" Margin="0,5" Padding="2"/>
+        <TextBox x:Name="IsbnTextBox" Grid.Row="4" Grid.Column="1" Margin="0,5" Padding="2" PreviewTextInput="NumberValidationTextBox"/>
 
         <TextBlock Text="Кол-во в наличии:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
-        <TextBox x:Name="QuantityTextBox" Grid.Row="5" Grid.Column="1" Margin="0,5" Padding="2"/>
+        <TextBox x:Name="QuantityTextBox" Grid.Row="5" Grid.Column="1" Margin="0,5" Padding="2" PreviewTextInput="NumberValidationTextBox"/>
 
         <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
             <Button Content="Сохранить" Click="Save_Click" Width="100" Margin="0,0,10,0" Background="#E6F4EA" Padding="5"/>

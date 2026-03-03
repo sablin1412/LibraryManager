@@ -37,15 +37,9 @@ namespace LibraryManager.Data
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.ISBN).IsRequired().HasMaxLength(20);
 
-                entity.HasOne(b => b.Author)
-                      .WithMany(a => a.Books)
-                      .HasForeignKey(b => b.AuthorId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(b => b.Genre)
-                      .WithMany(g => g.Books)
-                      .HasForeignKey(b => b.GenreId)
-                      .OnDelete(DeleteBehavior.Cascade);
+                // Настройка связи "многие-ко-многим"
+                entity.HasMany(b => b.Authors).WithMany(a => a.Books);
+                entity.HasMany(b => b.Genres).WithMany(g => g.Books);
             });
         }
     }
